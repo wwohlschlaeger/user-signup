@@ -22,18 +22,6 @@ USER_PW = re.compile(r"^.{3,20}$")
 USER_EM = re.compile(r"^[\S]+@[\S]+\.[\S]+$")
 
 
-#USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
-#def valid_username(username):
-    #return username and USER_RE.match(username)
-
-#USER_PW = re.compile(r"^.{3,20}$")
-#def valid_password(userpassword):
-    #return userpassword and USER_PW.match(userpassword)
-
-#USER_EM  = re.compile(r'^[\S]+@[\S]+\.[\S]+$')
-#def valid_email(email):
-    #return not email or USER_EM.match(email)
-
 
 errorsDict={"err_mass1":"","err_mass2":"","err_mass3":"","err_mass4":""}
 
@@ -72,104 +60,76 @@ class MainHandler(webapp2.RequestHandler):
         #if errorsDict['err_mass4'] != "":
         #    errorsDict['err_mass4']='<p class="error">'+errorsDict['err_mass4']+'</p>'
 
-        name_form = """
-            <form action="/ver" method="post">
+        user_form = """
+            <form action="/verified" method="post">
             <label>
                 Enter your name:
-                <input type="text" name="user_name"/>"""+errorsDict["err_mass1"]+"""
+                <input type="text" name="user_name" />"""+errorsDict["err_mass1"]+"""
             </label><br>
-
-
-
-
             <label>
                 Enter your password:
                 <input type="password" name="user_password" value = ""/>"""+errorsDict["err_mass2"]+"""
-            </label>
+            </label><br>
+            <label>
+                Re-enter your password:
+                <input type="password" name="passver" value=""/>"""+errorsDict["err_mass4"]+"""
+            </label><br>
+            <label>
+                Enter your email:
+                <input type="text" name="user_email"/>"""+errorsDict["err_mass3"]+"""
+            </label><br>
             <br><input type="submit" value="Submit"/>
-            </form>
-            """
-        #passver_form="""
-        #    <form action="/ver" method="post">
-        #    <label>
-        #        Re-enter your password:
-        #        <input type="password" name="passver" value=""/>"""+errorsDict["err_mass4"]+"""
-        #    </label>
-        #    </form>
-        #    """
-        #email_form="""
-        #    <form action="/ver" method="post">
-        #    <label>
-        #        Enter your email:
-        #        <input type="text" name="user_email"/>"""+errorsDict["err_mass3"]+"""
-        #    </label><br>
+        </form>
+        """
 
-        #</form>
-        #"""
-
-        page_content= page_header+name_form+page_footer#password_form+passver_form+email_form+page_footer
+        page_content= page_header+user_form+page_footer
         self.response.write(page_content)
 
 class verification(MainHandler):
     def post(self):
         username= self.request.get("user_name")
-        self.response.write(username)
         username= cgi.escape(username)
         userpassword= self.request.get("user_password")
         userpassword= cgi.escape(userpassword)
-        #verpass= self.request.get("passver")
-        #verpass= cgi.escape(verpass)
-        #email= self.request.get("user_email")
-        #email= cgi.escape(email)
+        verpass= self.request.get("passver")
+        verpass= cgi.escape(verpass)
+        email= self.request.get("user_email")
+        email= cgi.escape(email)
         passfail=False
 
-        #error_element1= USER_RE.match(username)
         if not USER_RE.match(username):
             errorsDict["err_mass1"]="This is not a valid user name."
             passfail=True
+        else:
+            errorsDict["err_mass1"]=""
 
-        #error_element2= USER_PW.match(userpassword)
         if not USER_PW.match(userpassword):
             errorsDict["err_mass2"]="This is not a valid password."
             passfail=True
+        else:
+            errorsDict["err_mass2"]=""
 
-        #error_element3= USER_EM.match(email)
-        #if not USER_EM.match(email):
-        #    errorsDict["err_mass3"]="This is not a valid email."
-        #    passfail=True
+        if not USER_EM.match(email):
+            errorsDict["err_mass3"]="This is not a valid email."
+            passfail=True
+        else:
+            errorsDict["err_mass3"]=""
 
-        #if userpassword != verpass:
-        #    errorsDict["err_mass4"]="The passwords do not match."
-        #    passfail=True
-
-
-        #if valid_username(username):
-        #    errorsDict["err_mass1"]="This is not a valid user name."
-        #    passfail=True
-
-        #if valid_password(userpassword):
-        #    errorsDict["err_mass2"]="This is not a valid password."
-        #    passfail=True
-        #elif userpassword != verpass:
-        #    errorsDict["err_mass4"]="The passwords do not match."
-        #    passfail=True
-
-        #if not valid_email(email):
-        #    errorsDict["err_mass3"]="This is not a valid email."
-        #    passfail=True
+        if userpassword != verpass:
+            errorsDict["err_mass4"]="The passwords do not match."
+            passfail=True
+        else:
+            errorsDict["err_mass4"]=""
 
 
         if passfail == True:
             self.redirect('/?errorsDict')
         else:
-            username=self.request.get('user_name')
-            #self.response.write('Welcome'+username+'!')
-
-#    #def get(self):
-
+            #username=self.request.get('user_name')
+            self.response.write('Welcome '+username+'!')
 
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
-    ('/ver', verification)
+    ('/verified', verification)
 ], debug=True)
