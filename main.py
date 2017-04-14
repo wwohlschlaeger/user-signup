@@ -109,9 +109,10 @@ class verification(MainHandler):
         else:
             errorsDict["err_mass2"]=""
 
-        if not USER_EM.match(email):
-            errorsDict["err_mass3"]="This is not a valid email."
-            passfail=True
+        if email:
+            if not USER_EM.match(email):
+                errorsDict["err_mass3"]="This is not a valid email."
+                passfail=True
         else:
             errorsDict["err_mass3"]=""
 
